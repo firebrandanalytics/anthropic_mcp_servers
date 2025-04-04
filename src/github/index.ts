@@ -203,144 +203,69 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         inputSchema: zodToJsonSchema(pulls.GetPullRequestReviewsSchema)
       },
       {
-        name: "list_projects",
-        description: "List projects in a GitHub repository",
-        inputSchema: zodToJsonSchema(projects.ListProjectsSchema),
+        name: "list_org_projects_v2",
+        description: "List Projects V2 for a GitHub organization",
+        inputSchema: zodToJsonSchema(projects.ListOrgProjectsV2Schema),
       },
       {
-        name: "create_project",
-        description: "Create a new project in a GitHub repository",
-        inputSchema: zodToJsonSchema(projects.CreateProjectSchema),
+        name: "create_org_project_v2",
+        description: "Create a new Project V2 in a GitHub organization",
+        inputSchema: zodToJsonSchema(projects.CreateOrgProjectV2Schema),
       },
       {
-        name: "get_project",
-        description: "Get details of a specific project in a GitHub repository",
-        inputSchema: zodToJsonSchema(projects.GetProjectSchema),
+        name: "list_repo_projects_v2",
+        description: "List Projects V2 for a GitHub repository",
+        inputSchema: zodToJsonSchema(projects.ListRepoProjectsV2Schema),
       },
       {
-        name: "update_project",
-        description: "Update a project in a GitHub repository",
-        inputSchema: zodToJsonSchema(projects.UpdateProjectSchema),
+        name: "create_repo_project_v2",
+        description: "Create a new Project V2 linked to a GitHub repository",
+        inputSchema: zodToJsonSchema(projects.CreateRepoProjectV2Schema),
       },
       {
-        name: "delete_project",
-        description: "Delete a project from a GitHub repository",
-        inputSchema: zodToJsonSchema(projects.DeleteProjectSchema),
+        name: "get_project_v2",
+        description: "Get details of a specific Project V2 by its Node ID",
+        inputSchema: zodToJsonSchema(projects.GetProjectV2Schema),
       },
       {
-        name: "list_project_columns",
-        description: "List columns in a GitHub project",
-        inputSchema: zodToJsonSchema(projects.ListProjectColumnsSchema),
+        name: "update_project_v2",
+        description: "Update a Project V2 (title, readme, state)",
+        inputSchema: zodToJsonSchema(projects.UpdateProjectV2Schema),
       },
       {
-        name: "create_project_column",
-        description: "Create a new column in a GitHub project",
-        inputSchema: zodToJsonSchema(projects.CreateProjectColumnSchema),
+        name: "delete_project_v2",
+        description: "Delete a Project V2 by its Node ID",
+        inputSchema: zodToJsonSchema(projects.DeleteProjectV2Schema),
       },
       {
-        name: "update_project_column",
-        description: "Update a column in a GitHub project",
-        inputSchema: zodToJsonSchema(projects.UpdateProjectColumnSchema),
+        name: "list_project_fields_v2",
+        description: "List fields defined for a Project V2",
+        inputSchema: zodToJsonSchema(projects.ListProjectFieldsV2Schema),
       },
       {
-        name: "delete_project_column",
-        description: "Delete a column from a GitHub project",
-        inputSchema: zodToJsonSchema(projects.DeleteProjectColumnSchema),
+        name: "list_project_items_v2",
+        description: "List items (Issues, PRs, Draft Issues) in a Project V2",
+        inputSchema: zodToJsonSchema(projects.ListProjectItemsV2Schema),
       },
       {
-        name: "list_project_cards",
-        description: "List cards in a GitHub project column",
-        inputSchema: zodToJsonSchema(projects.ListProjectCardsSchema),
+        name: "add_project_draft_issue_v2",
+        description: "Add a draft issue item to a Project V2",
+        inputSchema: zodToJsonSchema(projects.AddProjectDraftIssueV2Schema),
       },
       {
-        name: "create_project_card",
-        description: "Create a new card in a GitHub project column",
-        inputSchema: zodToJsonSchema(projects.CreateProjectCardSchema),
+        name: "add_project_item_by_id_v2",
+        description: "Add an existing Issue or Pull Request to a Project V2 using its Node ID",
+        inputSchema: zodToJsonSchema(projects.AddProjectItemByIdV2Schema),
       },
       {
-        name: "update_project_card",
-        description: "Update a card in a GitHub project",
-        inputSchema: zodToJsonSchema(projects.UpdateProjectCardSchema),
+        name: "update_project_item_field_value_v2",
+        description: "Update a field's value for an item in a Project V2 (used for changing status, priority, etc.)",
+        inputSchema: zodToJsonSchema(projects.UpdateProjectItemFieldValueV2Schema),
       },
       {
-        name: "delete_project_card",
-        description: "Delete a card from a GitHub project",
-        inputSchema: zodToJsonSchema(projects.DeleteProjectCardSchema),
-      },
-      {
-        name: "move_project_card",
-        description: "Move a card in a GitHub project",
-        inputSchema: zodToJsonSchema(projects.MoveProjectCardSchema),
-      },
-      {
-        name: "list_org_projects",
-        description: "List projects in a GitHub organization",
-        inputSchema: zodToJsonSchema(projects.ListOrgProjectsSchema),
-      },
-      {
-        name: "create_org_project",
-        description: "Create a new project in a GitHub organization",
-        inputSchema: zodToJsonSchema(projects.CreateOrgProjectSchema),
-      },
-      {
-        name: "get_org_project",
-        description: "Get details of a specific project in a GitHub organization",
-        inputSchema: zodToJsonSchema(projects.GetOrgProjectSchema),
-      },
-      {
-        name: "update_org_project",
-        description: "Update a project in a GitHub organization",
-        inputSchema: zodToJsonSchema(projects.UpdateOrgProjectSchema),
-      },
-      {
-        name: "delete_org_project",
-        description: "Delete a project from a GitHub organization",
-        inputSchema: zodToJsonSchema(projects.DeleteOrgProjectSchema),
-      },
-      {
-        name: "list_org_project_columns",
-        description: "List columns in a GitHub organization project",
-        inputSchema: zodToJsonSchema(projects.ListOrgProjectColumnsSchema),
-      },
-      {
-        name: "create_org_project_column",
-        description: "Create a new column in a GitHub organization project",
-        inputSchema: zodToJsonSchema(projects.CreateOrgProjectColumnSchema),
-      },
-      {
-        name: "update_org_project_column",
-        description: "Update a column in a GitHub organization project",
-        inputSchema: zodToJsonSchema(projects.UpdateOrgProjectColumnSchema),
-      },
-      {
-        name: "delete_org_project_column",
-        description: "Delete a column from a GitHub organization project",
-        inputSchema: zodToJsonSchema(projects.DeleteOrgProjectColumnSchema),
-      },
-      {
-        name: "list_org_project_cards",
-        description: "List cards in a GitHub organization project column",
-        inputSchema: zodToJsonSchema(projects.ListOrgProjectCardsSchema),
-      },
-      {
-        name: "create_org_project_card",
-        description: "Create a new card in a GitHub organization project column",
-        inputSchema: zodToJsonSchema(projects.CreateOrgProjectCardSchema),
-      },
-      {
-        name: "update_org_project_card",
-        description: "Update a card in a GitHub organization project",
-        inputSchema: zodToJsonSchema(projects.UpdateOrgProjectCardSchema),
-      },
-      {
-        name: "delete_org_project_card",
-        description: "Delete a card from a GitHub organization project",
-        inputSchema: zodToJsonSchema(projects.DeleteOrgProjectCardSchema),
-      },
-      {
-        name: "move_org_project_card",
-        description: "Move a card in a GitHub organization project",
-        inputSchema: zodToJsonSchema(projects.MoveOrgProjectCardSchema),
+        name: "delete_project_item_v2",
+        description: "Delete an item (Issue, PR, Draft Issue) from a Project V2 by its Node ID",
+        inputSchema: zodToJsonSchema(projects.DeleteProjectItemV2Schema),
       },
     ],
   };
@@ -632,247 +557,119 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         };
       }
 
-      case "list_projects": {
-        const args = projects.ListProjectsSchema.parse(request.params.arguments);
-        const { owner, repo, ...options } = args;
-        const projectsList = await projects.listProjects(owner, repo, options);
+      case "list_org_projects_v2": {
+        const args = projects.ListOrgProjectsV2Schema.parse(request.params.arguments);
+        const result = await projects.listOrgProjectsV2(args);
         return {
-          content: [{ type: "text", text: JSON.stringify(projectsList, null, 2) }],
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
         };
       }
 
-      case "create_project": {
-        const args = projects.CreateProjectSchema.parse(request.params.arguments);
-        const { owner, repo, ...options } = args;
-        const project = await projects.createProject(owner, repo, options);
+      case "create_org_project_v2": {
+        const args = projects.CreateOrgProjectV2Schema.parse(request.params.arguments);
+        const options = { title: args.title, orgLogin: (args as any).orgLogin };
+        if (!options.orgLogin) {
+            throw new Error("create_org_project_v2 requires 'orgLogin' argument (temporary requirement until schema/handler updated).");
+        }
+        const result = await projects.createOrgProjectV2(options);
         return {
-          content: [{ type: "text", text: JSON.stringify(project, null, 2) }],
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
         };
       }
 
-      case "get_project": {
-        const args = projects.GetProjectSchema.parse(request.params.arguments);
-        const project = await projects.getProject(args.owner, args.repo, args.project_number);
+      case "list_repo_projects_v2": {
+        const args = projects.ListRepoProjectsV2Schema.parse(request.params.arguments);
+        const result = await projects.listRepoProjectsV2(args);
         return {
-          content: [{ type: "text", text: JSON.stringify(project, null, 2) }],
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
         };
       }
 
-      case "update_project": {
-        const args = projects.UpdateProjectSchema.parse(request.params.arguments);
-        const { owner, repo, project_number, ...options } = args;
-        const updatedProject = await projects.updateProject(owner, repo, project_number, options);
+      case "create_repo_project_v2": {
+        const args = projects.CreateRepoProjectV2Schema.parse(request.params.arguments);
+        const options = { 
+            title: args.title, 
+            ownerLogin: (args as any).ownerLogin,
+            repoName: (args as any).repoName     
+        }; 
+        if (!options.ownerLogin || !options.repoName) {
+            throw new Error("create_repo_project_v2 requires 'ownerLogin' and 'repoName' arguments (temporary requirement until schema/handler updated).");
+        }
+        const result = await projects.createRepoProjectV2(options);
         return {
-          content: [{ type: "text", text: JSON.stringify(updatedProject, null, 2) }],
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
         };
       }
 
-      case "delete_project": {
-        const args = projects.DeleteProjectSchema.parse(request.params.arguments);
-        await projects.deleteProject(args.owner, args.repo, args.project_number);
+      case "get_project_v2": {
+        const args = projects.GetProjectV2Schema.parse(request.params.arguments);
+        const result = await projects.getProjectV2(args);
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      }
+
+      case "update_project_v2": {
+        const args = projects.UpdateProjectV2Schema.parse(request.params.arguments);
+        const result = await projects.updateProjectV2(args);
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      }
+
+      case "delete_project_v2": {
+        const args = projects.DeleteProjectV2Schema.parse(request.params.arguments);
+        await projects.deleteProjectV2(args);
         return {
           content: [{ type: "text", text: JSON.stringify({ success: true }, null, 2) }],
         };
       }
 
-      case "list_project_columns": {
-        const args = projects.ListProjectColumnsSchema.parse(request.params.arguments);
-        const { owner, repo, project_number, ...options } = args;
-        const columns = await projects.listProjectColumns(owner, repo, project_number, options);
+      case "list_project_fields_v2": {
+        const args = projects.ListProjectFieldsV2Schema.parse(request.params.arguments);
+        const result = await projects.listProjectFieldsV2(args);
         return {
-          content: [{ type: "text", text: JSON.stringify(columns, null, 2) }],
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
         };
       }
 
-      case "create_project_column": {
-        const args = projects.CreateProjectColumnSchema.parse(request.params.arguments);
-        const { owner, repo, project_number, ...options } = args;
-        const column = await projects.createProjectColumn(owner, repo, project_number, options);
+      case "list_project_items_v2": {
+        const args = projects.ListProjectItemsV2Schema.parse(request.params.arguments);
+        const result = await projects.listProjectItemsV2(args);
         return {
-          content: [{ type: "text", text: JSON.stringify(column, null, 2) }],
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
         };
       }
 
-      case "update_project_column": {
-        const args = projects.UpdateProjectColumnSchema.parse(request.params.arguments);
-        const { owner, repo, project_number, column_id, ...options } = args;
-        const updatedColumn = await projects.updateProjectColumn(owner, repo, project_number, column_id, options);
+      case "add_project_draft_issue_v2": {
+        const args = projects.AddProjectDraftIssueV2Schema.parse(request.params.arguments);
+        const result = await projects.addProjectDraftIssueV2(args);
         return {
-          content: [{ type: "text", text: JSON.stringify(updatedColumn, null, 2) }],
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
         };
       }
 
-      case "delete_project_column": {
-        const args = projects.DeleteProjectColumnSchema.parse(request.params.arguments);
-        await projects.deleteProjectColumn(args.owner, args.repo, args.project_number, args.column_id);
+      case "add_project_item_by_id_v2": {
+        const args = projects.AddProjectItemByIdV2Schema.parse(request.params.arguments);
+        const result = await projects.addProjectItemByIdV2(args);
         return {
-          content: [{ type: "text", text: JSON.stringify({ success: true }, null, 2) }],
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
         };
       }
 
-      case "list_project_cards": {
-        const args = projects.ListProjectCardsSchema.parse(request.params.arguments);
-        const { owner, repo, project_number, column_id, ...options } = args;
-        const cards = await projects.listProjectCards(owner, repo, project_number, column_id, options);
+      case "update_project_item_field_value_v2": {
+        const args = projects.UpdateProjectItemFieldValueV2Schema.parse(request.params.arguments);
+        const result = await projects.updateProjectItemFieldValueV2(args);
         return {
-          content: [{ type: "text", text: JSON.stringify(cards, null, 2) }],
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
         };
       }
 
-      case "create_project_card": {
-        const args = projects.CreateProjectCardSchema.parse(request.params.arguments);
-        const { owner, repo, project_number, column_id, ...options } = args;
-        const card = await projects.createProjectCard(owner, repo, project_number, column_id, options);
+      case "delete_project_item_v2": {
+        const args = projects.DeleteProjectItemV2Schema.parse(request.params.arguments);
+        const result = await projects.deleteProjectItemV2(args);
         return {
-          content: [{ type: "text", text: JSON.stringify(card, null, 2) }],
-        };
-      }
-
-      case "update_project_card": {
-        const args = projects.UpdateProjectCardSchema.parse(request.params.arguments);
-        const { owner, repo, project_number, card_id, ...options } = args;
-        const updatedCard = await projects.updateProjectCard(owner, repo, project_number, card_id, options);
-        return {
-          content: [{ type: "text", text: JSON.stringify(updatedCard, null, 2) }],
-        };
-      }
-
-      case "delete_project_card": {
-        const args = projects.DeleteProjectCardSchema.parse(request.params.arguments);
-        await projects.deleteProjectCard(args.owner, args.repo, args.project_number, args.card_id);
-        return {
-          content: [{ type: "text", text: JSON.stringify({ success: true }, null, 2) }],
-        };
-      }
-
-      case "move_project_card": {
-        const args = projects.MoveProjectCardSchema.parse(request.params.arguments);
-        const { owner, repo, project_number, card_id, position, column_id } = args;
-        await projects.moveProjectCard(owner, repo, project_number, card_id, position, column_id);
-        return {
-          content: [{ type: "text", text: JSON.stringify({ success: true }, null, 2) }],
-        };
-      }
-      
-      case "list_org_projects": {
-        const args = projects.ListOrgProjectsSchema.parse(request.params.arguments);
-        const { org, ...options } = args;
-        const projectsList = await projects.listOrgProjects(org, options);
-        return {
-          content: [{ type: "text", text: JSON.stringify(projectsList, null, 2) }],
-        };
-      }
-
-      case "create_org_project": {
-        const args = projects.CreateOrgProjectSchema.parse(request.params.arguments);
-        const { org, ...options } = args;
-        const project = await projects.createOrgProject(org, options);
-        return {
-          content: [{ type: "text", text: JSON.stringify(project, null, 2) }],
-        };
-      }
-
-      case "get_org_project": {
-        const args = projects.GetOrgProjectSchema.parse(request.params.arguments);
-        const project = await projects.getOrgProject(args.org, args.project_number);
-        return {
-          content: [{ type: "text", text: JSON.stringify(project, null, 2) }],
-        };
-      }
-
-      case "update_org_project": {
-        const args = projects.UpdateOrgProjectSchema.parse(request.params.arguments);
-        const { org, project_number, ...options } = args;
-        const updatedProject = await projects.updateOrgProject(org, project_number, options);
-        return {
-          content: [{ type: "text", text: JSON.stringify(updatedProject, null, 2) }],
-        };
-      }
-
-      case "delete_org_project": {
-        const args = projects.DeleteOrgProjectSchema.parse(request.params.arguments);
-        await projects.deleteOrgProject(args.org, args.project_number);
-        return {
-          content: [{ type: "text", text: JSON.stringify({ success: true }, null, 2) }],
-        };
-      }
-
-      case "list_org_project_columns": {
-        const args = projects.ListOrgProjectColumnsSchema.parse(request.params.arguments);
-        const { org, project_number, ...options } = args;
-        const columns = await projects.listOrgProjectColumns(org, project_number, options);
-        return {
-          content: [{ type: "text", text: JSON.stringify(columns, null, 2) }],
-        };
-      }
-
-      case "create_org_project_column": {
-        const args = projects.CreateOrgProjectColumnSchema.parse(request.params.arguments);
-        const { org, project_number, ...options } = args;
-        const column = await projects.createOrgProjectColumn(org, project_number, options);
-        return {
-          content: [{ type: "text", text: JSON.stringify(column, null, 2) }],
-        };
-      }
-
-      case "update_org_project_column": {
-        const args = projects.UpdateOrgProjectColumnSchema.parse(request.params.arguments);
-        const { org, project_number, column_id, ...options } = args;
-        const updatedColumn = await projects.updateOrgProjectColumn(org, project_number, column_id, options);
-        return {
-          content: [{ type: "text", text: JSON.stringify(updatedColumn, null, 2) }],
-        };
-      }
-
-      case "delete_org_project_column": {
-        const args = projects.DeleteOrgProjectColumnSchema.parse(request.params.arguments);
-        await projects.deleteOrgProjectColumn(args.org, args.project_number, args.column_id);
-        return {
-          content: [{ type: "text", text: JSON.stringify({ success: true }, null, 2) }],
-        };
-      }
-
-      case "list_org_project_cards": {
-        const args = projects.ListOrgProjectCardsSchema.parse(request.params.arguments);
-        const { org, project_number, column_id, ...options } = args;
-        const cards = await projects.listOrgProjectCards(org, project_number, column_id, options);
-        return {
-          content: [{ type: "text", text: JSON.stringify(cards, null, 2) }],
-        };
-      }
-
-      case "create_org_project_card": {
-        const args = projects.CreateOrgProjectCardSchema.parse(request.params.arguments);
-        const { org, project_number, column_id, ...options } = args;
-        const card = await projects.createOrgProjectCard(org, project_number, column_id, options);
-        return {
-          content: [{ type: "text", text: JSON.stringify(card, null, 2) }],
-        };
-      }
-
-      case "update_org_project_card": {
-        const args = projects.UpdateOrgProjectCardSchema.parse(request.params.arguments);
-        const { org, project_number, card_id, ...options } = args;
-        const updatedCard = await projects.updateOrgProjectCard(org, project_number, card_id, options);
-        return {
-          content: [{ type: "text", text: JSON.stringify(updatedCard, null, 2) }],
-        };
-      }
-
-      case "delete_org_project_card": {
-        const args = projects.DeleteOrgProjectCardSchema.parse(request.params.arguments);
-        await projects.deleteOrgProjectCard(args.org, args.project_number, args.card_id);
-        return {
-          content: [{ type: "text", text: JSON.stringify({ success: true }, null, 2) }],
-        };
-      }
-
-      case "move_org_project_card": {
-        const args = projects.MoveOrgProjectCardSchema.parse(request.params.arguments);
-        const { org, project_number, card_id, position, column_id } = args;
-        await projects.moveOrgProjectCard(org, project_number, card_id, position, column_id);
-        return {
-          content: [{ type: "text", text: JSON.stringify({ success: true }, null, 2) }],
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
         };
       }
 
