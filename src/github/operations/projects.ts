@@ -185,7 +185,7 @@ const UPDATE_PROJECT_ITEM_FIELD_MUTATION = `
     $projectId: ID!,
     $itemId: ID!,
     $fieldId: ID!,
-    $value: ProjectV2FieldValueInput!
+    $value: ProjectV2FieldValue!
   ) {
     updateProjectV2ItemFieldValue(input: {
       projectId: $projectId,
@@ -258,4 +258,170 @@ export async function updateProjectCardSingleSelectField(
   }
 
   return responseData.updateProjectV2ItemFieldValue.projectV2Item.id;
+}
+
+// --- Update Project Card Text Field ---
+
+// Schema for updating a text field on a project card
+export const UpdateProjectCardTextFieldSchema = z.object({
+  projectId: z.string().describe('The Node ID of the Project (e.g., "PVT_kwDO...)'),
+  itemId: z.string().describe('The Node ID of the Project Item (card) to update (e.g., "PVTI_lADO...)'),
+  fieldId: z.string().describe('The Node ID of the custom text field to update (e.g., "PVTFT_lADO...)'),
+  text: z.string().describe('The new text value for the field.'),
+});
+
+// Function to update a text field on a project card
+export async function updateProjectCardTextField(
+  projectId: string,
+  itemId: string,
+  fieldId: string,
+  text: string
+): Promise<string> { // Returns the ID of the updated item
+  const variables = {
+    projectId: projectId,
+    itemId: itemId,
+    fieldId: fieldId,
+    value: {
+      // The 'value' input type depends on the field being updated.
+      // For text fields, it's 'text'.
+      text: text
+    }
+  };
+
+  // Reuse the existing mutation and response type assertion
+  const responseData = await githubGraphQLRequest(UPDATE_PROJECT_ITEM_FIELD_MUTATION, variables) as UpdateProjectItemFieldResponse;
+
+  // Validate response structure (reusing logic from single-select update)
+  if (
+    !responseData ||
+    !responseData.updateProjectV2ItemFieldValue ||
+    !responseData.updateProjectV2ItemFieldValue.projectV2Item ||
+    typeof responseData.updateProjectV2ItemFieldValue.projectV2Item.id !== 'string'
+  ) {
+    console.error("Unexpected response structure from GitHub GraphQL API:", responseData);
+    throw new Error("Failed to update project card text field: Invalid response structure.");
+  }
+
+  // Optional: Check if the returned ID matches the requested ID
+  if (responseData.updateProjectV2ItemFieldValue.projectV2Item.id !== itemId) {
+     console.warn(`Updated item ID (${responseData.updateProjectV2ItemFieldValue.projectV2Item.id}) does not match requested item ID (${itemId}).`);
+  }
+
+  return responseData.updateProjectV2ItemFieldValue.projectV2Item.id;
+}
+
+// --- List Project Fields ---
+
+// Schema for listing project fields
+export const ListProjectFieldsSchema = z.object({
+  projectId: z.string().describe('The Node ID of the Project (e.g., "PVT_kwDO...)'),
+});
+
+// GraphQL query to fetch project fields, including options for single-select
+const GET_PROJECT_FIELDS_QUERY = `
+  query GetProjectFields($projectId: ID!) {
+    node(id: $projectId) {
+      ... on ProjectV2 {
+        fields(first: 100) { # Fetch up to 100 fields
+          nodes {
+            ... on ProjectV2FieldCommon {
+              id
+              name
+              dataType
+            }
+            ... on ProjectV2SingleSelectField {
+              options {
+                id
+                name
+              }
+            }
+            # Add fragments for other field types if needed (e.g., Iteration, Date)
+          }
+        }
+      }
+    }
+  }
+`;
+
+// Type for individual field options (for single-select)
+export type FieldOption = {
+  id: string;
+  name: string;
+};
+
+// Type for the field information we want to return
+export type ProjectFieldInfo = {
+  id: string;
+  name: string;
+  dataType: string; // e.g., "TEXT", "SINGLE_SELECT", "NUMBER", "DATE", "ITERATION"
+  options?: FieldOption[]; // Only populated for SINGLE_SELECT fields
+};
+
+// Type for the raw GraphQL response structure (simplified)
+type ProjectFieldsQueryResponse = {
+    node: {
+        fields: {
+            nodes: Array<{
+                id: string;
+                name: string;
+                dataType: string;
+                options?: Array<{ id: string; name: string }>;
+            }>
+        }
+    } | null; // node could be null if ID not found or not a ProjectV2
+};
+
+
+// Function to list fields for a project
+export async function listProjectFields(
+  projectId: string
+): Promise<ProjectFieldInfo[]> {
+  const variables = {
+    projectId: projectId,
+  };
+
+  const responseData = await githubGraphQLRequest(GET_PROJECT_FIELDS_QUERY, variables) as ProjectFieldsQueryResponse;
+
+  // Validate response structure
+  if (
+    !responseData ||
+    !responseData.node ||
+    !responseData.node.fields ||
+    !Array.isArray(responseData.node.fields.nodes)
+  ) {
+    // Handle case where project ID might be invalid or not a ProjectV2
+    const projectExistsCheck = await githubGraphQLRequest(`query CheckProject($id: ID!) { node(id: $id) { id } }`, { id: projectId });
+    if (!projectExistsCheck || !projectExistsCheck.node) {
+        throw new Error(`Project with ID "${projectId}" not found.`);
+    }
+    // If project exists but structure is wrong, it's an unexpected API response
+    console.error("Unexpected response structure from GitHub GraphQL API for project fields:", responseData);
+    throw new Error("Failed to fetch project fields: Invalid response structure.");
+  }
+
+  // Extract and map the field nodes
+  const fields: ProjectFieldInfo[] = responseData.node.fields.nodes.map((node) => {
+    // Basic validation for each node
+    if (!node || typeof node.id !== 'string' || typeof node.name !== 'string' || typeof node.dataType !== 'string') {
+        console.warn("Skipping invalid project field node:", node);
+        return null; // Skip invalid nodes
+    }
+
+    const fieldInfo: ProjectFieldInfo = {
+      id: node.id,
+      name: node.name,
+      dataType: node.dataType,
+    };
+
+    // Include options if they exist (for single select fields)
+    if (node.dataType === 'SINGLE_SELECT' && Array.isArray(node.options)) {
+      fieldInfo.options = node.options
+        .map(opt => (opt && typeof opt.id === 'string' && typeof opt.name === 'string' ? { id: opt.id, name: opt.name } : null))
+        .filter((opt): opt is FieldOption => opt !== null); // Filter out any invalid options
+    }
+
+    return fieldInfo;
+  }).filter((f): f is ProjectFieldInfo => f !== null); // Filter out any nulls from skipped nodes
+
+  return fields;
 }

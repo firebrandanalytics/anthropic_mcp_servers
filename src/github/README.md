@@ -303,6 +303,27 @@ MCP Server for the GitHub API, enabling file operations, repository management, 
       - `singleSelectOptionId` (string): The Node ID of the specific option to select for the field (e.g., "f75ad...").
     - Returns: The Node ID of the updated project item (card).
 
+30. `update_project_card_text_field`
+    - Update a text custom field on a GitHub Project (v2) card. Note: Uses GraphQL API. Requires knowing the specific Node IDs for the project, item, and field.
+    - Inputs:
+      - `projectId` (string): The Node ID of the Project (e.g., "PVT_kwDO...").
+      - `itemId` (string): The Node ID of the Project Item (card) to update (e.g., "PVTI_lADO...").
+      - `fieldId` (string): The Node ID of the custom text field to update (e.g., "PVTFT_lADO...").
+      - `text` (string): The new text value for the field.
+    - Returns: The Node ID of the updated project item (card).
+
+31. `list_project_fields`
+    - List the fields (columns) available in a specific GitHub Project (v2). This includes built-in fields like "Title", "Assignees", "Status", etc., as well as any custom fields. For single-select fields, it also lists the available options with their IDs. Use this to find the correct `fieldId` (and `singleSelectOptionId` if applicable) needed for the update tools. Note: Uses GraphQL API.
+    - Inputs:
+      - `projectId` (string): The Node ID of the Project (e.g., "PVT_kwDO...").
+    - Returns: An array of field details, each containing:
+      - `id` (string): The Node ID of the field (use this as `fieldId` in update tools).
+      - `name` (string): The display name of the field (e.g., "Title", "Status", "My Custom Field").
+      - `dataType` (string): The type of the field (e.g., "TEXT", "SINGLE_SELECT", "NUMBER", "DATE", "ITERATION", "ASSIGNEES").
+      - `options` (optional array): For `SINGLE_SELECT` fields, an array of available options, each with:
+        - `id` (string): The Node ID of the option (use this as `singleSelectOptionId` in the `update_project_card_field` tool).
+        - `name` (string): The display name of the option (e.g., "Todo", "In Progress", "Done").
+
 ## Search Query Syntax
 
 ### Code Search

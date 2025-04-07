@@ -217,6 +217,16 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         description: "Update a single-select custom field on a GitHub Project (v2) card",
         inputSchema: zodToJsonSchema(projects.UpdateProjectCardFieldSchema),
       },
+      {
+        name: "update_project_card_text_field",
+        description: "Update a text custom field on a GitHub Project (v2) card",
+        inputSchema: zodToJsonSchema(projects.UpdateProjectCardTextFieldSchema),
+      },
+      {
+        name: "list_project_fields",
+        description: "List the fields (columns) available in a specific GitHub Project (v2), including options for single-select fields.",
+        inputSchema: zodToJsonSchema(projects.ListProjectFieldsSchema),
+      },
     ],
   };
 });
@@ -532,7 +542,28 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             args.singleSelectOptionId
         );
         return {
-           content: [{ type: "text", text: `Successfully updated field for project card ID: ${updatedItemId}` }],
+           content: [{ type: "text", text: `Successfully updated single-select field for project card ID: ${updatedItemId}` }],
+        };
+      }
+
+      case "update_project_card_text_field": {
+        const args = projects.UpdateProjectCardTextFieldSchema.parse(request.params.arguments);
+        const updatedItemId = await projects.updateProjectCardTextField(
+            args.projectId,
+            args.itemId,
+            args.fieldId,
+            args.text
+        );
+        return {
+           content: [{ type: "text", text: `Successfully updated text field for project card ID: ${updatedItemId}` }],
+        };
+      }
+
+      case "list_project_fields": {
+        const args = projects.ListProjectFieldsSchema.parse(request.params.arguments);
+        const fields = await projects.listProjectFields(args.projectId);
+        return {
+           content: [{ type: "text", text: JSON.stringify(fields, null, 2) }],
         };
       }
 
