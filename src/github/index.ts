@@ -227,6 +227,16 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         description: "List the fields (columns) available in a specific GitHub Project (v2), including options for single-select fields.",
         inputSchema: zodToJsonSchema(projects.ListProjectFieldsSchema),
       },
+      {
+        name: "list_project_items",
+        description: "List the items (cards) in a specific GitHub Project (v2).",
+        inputSchema: zodToJsonSchema(projects.ListProjectItemsSchema),
+      },
+      {
+        name: "convert_project_draft_to_issue",
+        description: "Convert a draft issue item in a GitHub Project (v2) to a repository issue.",
+        inputSchema: zodToJsonSchema(projects.ConvertProjectDraftToIssueSchema),
+      },
     ],
   };
 });
@@ -564,6 +574,22 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         const fields = await projects.listProjectFields(args.projectId);
         return {
            content: [{ type: "text", text: JSON.stringify(fields, null, 2) }],
+        };
+      }
+
+      case "list_project_items": {
+        const args = projects.ListProjectItemsSchema.parse(request.params.arguments);
+        const items = await projects.listProjectItems(args.projectId);
+        return {
+           content: [{ type: "text", text: JSON.stringify(items, null, 2) }],
+        };
+      }
+
+      case "convert_project_draft_to_issue": {
+        const args = projects.ConvertProjectDraftToIssueSchema.parse(request.params.arguments);
+        const result = await projects.convertProjectDraftToIssue(args);
+        return {
+           content: [{ type: "text", text: `Successfully converted draft. New issue created: ${result.issueUrl} (ID: ${result.newItemId}, Number: ${result.issueNumber})` }],
         };
       }
 

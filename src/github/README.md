@@ -324,6 +324,35 @@ MCP Server for the GitHub API, enabling file operations, repository management, 
         - `id` (string): The Node ID of the option (use this as `singleSelectOptionId` in the `update_project_card_field` tool).
         - `name` (string): The display name of the option (e.g., "Todo", "In Progress", "Done").
 
+32. `list_project_items`
+    - List the items (cards) in a specific GitHub Project (v2). Fetches the first 100 items by default.
+    - Inputs:
+      - `projectId` (string): The Node ID of the Project (e.g., "PVT_kwDO...").
+    - Returns: An array of item details, each containing:
+      - `itemId` (string): The Node ID of the project item (card).
+      - `itemType` (string): The type of the item ('DRAFT_ISSUE', 'ISSUE', 'PULL_REQUEST').
+      - `content` (object | null): Details about the underlying content, including:
+        - `title` (optional string): Title of the draft issue, issue, or PR.
+        - `number` (optional number): Issue or PR number.
+        - `url` (optional string): URL of the issue or PR.
+        - `state` (optional string): State of the issue or PR ('OPEN', 'CLOSED', 'MERGED').
+        - `repository` (optional string): Repository name with owner (e.g., "owner/repo").
+        - `owner` (optional string): Repository owner login.
+        - `createdAt` (optional string): ISO 8601 timestamp of creation.
+        - `updatedAt` (optional string): ISO 8601 timestamp of last update.
+
+33. `convert_project_draft_to_issue`
+    - Converts a draft issue item (card) within a Project V2 into a full issue in a specified repository.
+    - Inputs:
+      - `projectItemId` (string): The Node ID of the ProjectV2Item (the card) currently holding the draft issue. Use `list_project_items` to find this.
+      - `repositoryId` (string): The Node ID of the repository where the new issue should be created.
+      - `title` (optional string): Title for the new issue. Defaults to the draft issue's title if omitted.
+      - `body` (optional string): Body content for the new issue.
+      - `assigneeIds` (optional array of strings): Node IDs of users to assign to the new issue.
+      - `labelIds` (optional array of strings): Node IDs of labels to add to the new issue.
+      - `milestoneId` (optional string): Node ID of a milestone to associate with the new issue.
+    - Returns: Details of the newly created repository issue, including its Node ID (`newItemId`), number (`issueNumber`), and URL (`issueUrl`). The original project item (card) now points to this new issue.
+
 ## Search Query Syntax
 
 ### Code Search
@@ -384,7 +413,6 @@ To use this with Claude Desktop, add the following to your `claude_desktop_confi
 ```
 
 ### NPX
-
 ```json
 {
   "mcpServers": {
