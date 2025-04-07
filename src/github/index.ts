@@ -27,6 +27,7 @@ import {
   isGitHubError,
 } from './common/errors.js';
 import { VERSION } from "./common/version.js";
+import * as projects from './operations/projects.js';
 
 // If fetch doesn't exist in global scope, add it
 if (!globalThis.fetch) {
@@ -200,7 +201,22 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         name: "get_pull_request_reviews",
         description: "Get the reviews on a pull request",
         inputSchema: zodToJsonSchema(pulls.GetPullRequestReviewsSchema)
-      }
+      },
+      {
+        name: "list_organization_projects",
+        description: "List Projects (v2) for a GitHub organization",
+        inputSchema: zodToJsonSchema(projects.ListOrgProjectsSchema),
+      },
+      {
+        name: "create_project_card",
+        description: "Create a new draft issue card in a GitHub Project (v2)",
+        inputSchema: zodToJsonSchema(projects.CreateProjectDraftIssueSchema),
+      },
+      {
+        name: "update_project_card_field",
+        description: "Update a single-select custom field on a GitHub Project (v2) card",
+        inputSchema: zodToJsonSchema(projects.UpdateProjectCardFieldSchema),
+      },
     ],
   };
 });
@@ -488,6 +504,35 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         const reviews = await pulls.getPullRequestReviews(args.owner, args.repo, args.pull_number);
         return {
           content: [{ type: "text", text: JSON.stringify(reviews, null, 2) }],
+        };
+      }
+
+      case "list_organization_projects": {
+        const args = projects.ListOrgProjectsSchema.parse(request.params.arguments);
+        const results = await projects.listOrganizationProjects(args.organizationLogin);
+        return {
+           content: [{ type: "text", text: JSON.stringify(results, null, 2) }],
+        };
+      }
+
+      case "create_project_card": {
+        const args = projects.CreateProjectDraftIssueSchema.parse(request.params.arguments);
+        const itemId = await projects.createProjectDraftIssueCard(args.projectId, args.title);
+        return {
+          content: [{ type: "text", text: `Successfully created project card with ID: ${itemId}` }],
+        };
+      }
+
+      case "update_project_card_field": {
+        const args = projects.UpdateProjectCardFieldSchema.parse(request.params.arguments);
+        const updatedItemId = await projects.updateProjectCardSingleSelectField(
+            args.projectId,
+            args.itemId,
+            args.fieldId,
+            args.singleSelectOptionId
+        );
+        return {
+           content: [{ type: "text", text: `Successfully updated field for project card ID: ${updatedItemId}` }],
         };
       }
 

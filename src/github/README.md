@@ -281,6 +281,28 @@ MCP Server for the GitHub API, enabling file operations, repository management, 
      - `pull_number` (number): Pull request number
    - Returns: Array of pull request reviews with details like the review state (APPROVED, CHANGES_REQUESTED, etc.), reviewer, and review body
 
+27. `list_organization_projects`
+    - List Projects (v2) for a GitHub organization. Note: Uses GraphQL API.
+    - Inputs:
+      - `organizationLogin` (string): The login name of the GitHub organization.
+    - Returns: Array of project details (ID, title, URL).
+
+28. `create_project_card`
+    - Create a new draft issue card in a GitHub Project (v2). Note: Uses GraphQL API.
+    - Inputs:
+      - `projectId` (string): The Node ID of the Project (e.g., "PVT_kwDO...").
+      - `title` (string): The title for the draft issue card.
+    - Returns: The Node ID of the newly created project item (card).
+
+29. `update_project_card_field`
+    - Update a single-select custom field on a GitHub Project (v2) card. Note: Uses GraphQL API. Requires knowing the specific Node IDs for the project, item, field, and option.
+    - Inputs:
+      - `projectId` (string): The Node ID of the Project (e.g., "PVT_kwDO...").
+      - `itemId` (string): The Node ID of the Project Item (card) to update (e.g., "PVTI_lADO...").
+      - `fieldId` (string): The Node ID of the custom single-select field to update (e.g., "PVTSSF_lADO...").
+      - `singleSelectOptionId` (string): The Node ID of the specific option to select for the field (e.g., "f75ad...").
+    - Returns: The Node ID of the updated project item (card).
+
 ## Search Query Syntax
 
 ### Code Search

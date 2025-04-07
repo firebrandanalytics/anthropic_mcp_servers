@@ -1,12 +1,15 @@
 import { getUserAgent } from "universal-user-agent";
-import { createGitHubError } from "./errors.js";
+import {
+  createGitHubError,
+  GitHubError,
+} from "./errors.js";
 import { VERSION } from "./version.js";
 
 type RequestOptions = {
   method?: string;
   body?: unknown;
   headers?: Record<string, string>;
-}
+};
 
 async function parseResponseBody(response: Response): Promise<unknown> {
   const contentType = response.headers.get("content-type");
@@ -16,7 +19,10 @@ async function parseResponseBody(response: Response): Promise<unknown> {
   return response.text();
 }
 
-export function buildUrl(baseUrl: string, params: Record<string, string | number | undefined>): string {
+export function buildUrl(
+  baseUrl: string,
+  params: Record<string, string | number | undefined>
+): string {
   const url = new URL(baseUrl);
   Object.entries(params).forEach(([key, value]) => {
     if (value !== undefined) {
@@ -134,5 +140,87 @@ export async function checkUserExists(username: string): Promise<boolean> {
       return false;
     }
     throw error;
+  }
+}
+
+// Define the GraphQL endpoint
+const GITHUB_GRAPHQL_ENDPOINT = "https://api.github.com/graphql";
+
+// Helper for GitHub GraphQL API requests
+export async function githubGraphQLRequest(
+  query: string,
+  variables?: Record<string, any>
+): Promise<any> {
+  // Consider using a more specific return type if possible
+  const headers: Record<string, string> = {
+    Accept: "application/json",
+    "Content-Type": "application/json",
+    "User-Agent": USER_AGENT,
+  };
+
+  if (process.env.GITHUB_PERSONAL_ACCESS_TOKEN) {
+    headers[
+      "Authorization"
+    ] = `Bearer ${process.env.GITHUB_PERSONAL_ACCESS_TOKEN}`;
+  } else {
+    throw new Error(
+      "GITHUB_PERSONAL_ACCESS_TOKEN environment variable is required for GraphQL requests."
+    );
+  }
+
+  const body = JSON.stringify({
+    query,
+    variables,
+  });
+
+  try {
+    const response = await fetch(GITHUB_GRAPHQL_ENDPOINT, {
+      method: "POST",
+      headers,
+      body,
+    });
+
+    const responseBody = await parseResponseBody(response);
+
+    if (
+      response.ok &&
+      typeof responseBody === "object" &&
+      responseBody !== null &&
+      "errors" in responseBody &&
+      Array.isArray(responseBody.errors) &&
+      responseBody.errors.length > 0
+    ) {
+      const errorMessages = responseBody.errors
+        .map((err: any) => err.message || "Unknown GraphQL error")
+        .join("; ");
+      throw new Error(`GraphQL Query Error(s): ${errorMessages}`);
+    }
+
+    if (!response.ok) {
+      throw createGitHubError(response.status, responseBody);
+    }
+
+    if (
+      typeof responseBody !== "object" ||
+      responseBody === null ||
+      !("data" in responseBody)
+    ) {
+      throw new Error('Invalid GraphQL response: "data" field missing.');
+    }
+
+    return responseBody.data;
+  } catch (error) {
+    if (
+      error instanceof GitHubError ||
+      (error instanceof Error &&
+        error.message.startsWith("GraphQL Query Error"))
+    ) {
+      throw error;
+    }
+    throw new Error(
+      `GraphQL request failed: ${
+        error instanceof Error ? error.message : String(error)
+      }`
+    );
   }
 }
