@@ -342,16 +342,11 @@ MCP Server for the GitHub API, enabling file operations, repository management, 
         - `updatedAt` (optional string): ISO 8601 timestamp of last update.
 
 33. `convert_project_draft_to_issue`
-    - Converts a draft issue item (card) within a Project V2 into a full issue in a specified repository.
+    - Converts a draft issue item (card) within a Project V2 into a full issue in a specified repository. The new issue inherits the title from the draft. Further updates (body, assignees, labels) must be done via issue update tools.
     - Inputs:
       - `projectItemId` (string): The Node ID of the ProjectV2Item (the card) currently holding the draft issue. Use `list_project_items` to find this.
       - `repositoryId` (string): The Node ID of the repository where the new issue should be created.
-      - `title` (optional string): Title for the new issue. Defaults to the draft issue's title if omitted.
-      - `body` (optional string): Body content for the new issue.
-      - `assigneeIds` (optional array of strings): Node IDs of users to assign to the new issue.
-      - `labelIds` (optional array of strings): Node IDs of labels to add to the new issue.
-      - `milestoneId` (optional string): Node ID of a milestone to associate with the new issue.
-    - Returns: Details of the newly created repository issue, including its Node ID (`newItemId`), number (`issueNumber`), and URL (`issueUrl`). The original project item (card) now points to this new issue.
+    - Returns: Details of the newly created repository issue, including its Node ID (`newItemId`), number (`issueNumber`), and URL (`issueUrl`).
 
 ## Search Query Syntax
 

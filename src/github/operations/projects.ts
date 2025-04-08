@@ -588,45 +588,21 @@ export async function listProjectItems(
 
 // --- Convert Project Draft Item to Issue ---
 
-// Schema for converting a draft issue item to a repository issue
 export const ConvertProjectDraftToIssueSchema = z.object({
-  projectItemId: z.string().describe('The Node ID of the ProjectV2Item (the card) containing the draft issue.'),
-  repositoryId: z.string().describe('The Node ID of the repository where the new issue should be created.'),
-  title: z.string().optional().describe('Optional: New title for the issue (defaults to draft issue title).'),
-  body: z.string().optional().describe('Optional: Body for the new issue.'),
-  assigneeIds: z.array(z.string()).optional().describe('Optional: Array of Node IDs for users to assign.'),
-  labelIds: z.array(z.string()).optional().describe('Optional: Array of Node IDs for labels to add.'),
-  milestoneId: z.string().optional().describe('Optional: Node ID of the milestone to associate.'),
+  projectItemId: z.string().describe('The ID of the draft issue ProjectV2Item to convert.'),
+  repositoryId: z.string().describe('The ID of the repository to create the issue in.'),
 });
 
-// GraphQL mutation to convert a draft issue item to a repository issue
-// See: https://docs.github.com/en/graphql/reference/mutations#convertprojectv2itemtoissue
 const CONVERT_PROJECT_DRAFT_TO_ISSUE_MUTATION = `
-  mutation ConvertDraftToIssue(
-    $projectItemId: ID!,
-    $repositoryId: ID!,
-    $title: String,
-    $body: String,
-    $assigneeIds: [ID!],
-    $labelIds: [ID!],
-    $milestoneId: ID
-  ) {
-    convertProjectV2ItemToIssue(input: {
-      projectItemId: $projectItemId,
-      repositoryId: $repositoryId,
-      title: $title,
-      body: $body,
-      assigneeIds: $assigneeIds,
-      labelIds: $labelIds,
-      milestoneId: $milestoneId
-    }) {
-      # The payload contains the updated ProjectV2Item
-      projectV2Item {
-        id # ID of the card (item) remains the same
-        # We can query the content to confirm it's now an issue
+  mutation ConvertDraftToIssue($input: ConvertProjectV2DraftIssueItemToIssueInput!) {
+    convertProjectV2DraftIssueItemToIssue(input: $input) {
+      # The correct field name is 'item' not 'projectV2Item'
+      item {
+        id # ID of the card (item) itself
+        # Check the content, which should now be an Issue
         content {
           ... on Issue {
-            id # Return the Node ID of the newly created Issue
+            id # Node ID of the newly created Issue
             number
             url
           }
@@ -636,59 +612,52 @@ const CONVERT_PROJECT_DRAFT_TO_ISSUE_MUTATION = `
   }
 `;
 
-// Type for the mutation response
 export type ConvertDraftToIssueResponse = {
-  convertProjectV2ItemToIssue: {
-    projectV2Item: {
+  convertProjectV2DraftIssueItemToIssue: {
+    item: {
       id: string;
-      content?: { // Content might be null or not an Issue if something went wrong
+      content?: {
         id?: string;
         number?: number;
         url?: string;
       } | null;
-    };
+    } | null;
   };
 };
 
-// Function to convert a draft issue item to a repository issue
+
 export async function convertProjectDraftToIssue(
   params: z.infer<typeof ConvertProjectDraftToIssueSchema>
-): Promise<{ newItemId: string; issueNumber?: number; issueUrl?: string }> {
-  // Prepare variables, removing undefined optional fields
-  const variables = {
-    projectItemId: params.projectItemId,
+): Promise<{ newItemId: string; issueNumber: number; issueUrl: string }> {
+  const input = {
+    itemId: params.projectItemId,
     repositoryId: params.repositoryId,
-    ...(params.title && { title: params.title }),
-    ...(params.body && { body: params.body }),
-    ...(params.assigneeIds && { assigneeIds: params.assigneeIds }),
-    ...(params.labelIds && { labelIds: params.labelIds }),
-    ...(params.milestoneId && { milestoneId: params.milestoneId }),
   };
+  const variables = { input };
 
   const responseData = await githubGraphQLRequest(CONVERT_PROJECT_DRAFT_TO_ISSUE_MUTATION, variables) as ConvertDraftToIssueResponse;
 
-  // Validate response structure and check if conversion was successful
+  const projectItem = responseData?.convertProjectV2DraftIssueItemToIssue?.item;
+  const issueContent = projectItem?.content;
+
   if (
-    !responseData ||
-    !responseData.convertProjectV2ItemToIssue ||
-    !responseData.convertProjectV2ItemToIssue.projectV2Item ||
-    typeof responseData.convertProjectV2ItemToIssue.projectV2Item.id !== 'string'
+    !projectItem ||
+    !issueContent ||
+    typeof issueContent.id !== 'string' ||
+    typeof issueContent.number !== 'number' ||
+    typeof issueContent.url !== 'string'
   ) {
-    console.error("Unexpected response structure from GitHub GraphQL API during draft conversion:", responseData);
-    throw new Error("Failed to convert draft to issue: Invalid response structure.");
-  }
-
-  const convertedItem = responseData.convertProjectV2ItemToIssue.projectV2Item;
-
-  // Check if the content is now an issue and extract details
-  if (!convertedItem.content || typeof convertedItem.content.id !== 'string') {
-      console.error("Conversion seemed to succeed, but the item content is not an issue:", convertedItem);
-      throw new Error("Failed to convert draft to issue: Resulting item content is not a valid issue.");
+    console.error("Unexpected response structure or missing issue data after draft conversion:", JSON.stringify(responseData, null, 2));
+    // Check if it's because the content wasn't an issue
+    if (projectItem && projectItem.content) {
+         throw new Error("Failed to convert draft to issue: Resulting item content is not a valid issue.");
+    }
+    throw new Error("Failed to convert draft to issue: Invalid response structure or issue data missing.");
   }
 
   return {
-    newItemId: convertedItem.content.id, // Return the Node ID of the *new Issue*
-    issueNumber: convertedItem.content.number,
-    issueUrl: convertedItem.content.url,
+    newItemId: issueContent.id,
+    issueNumber: issueContent.number,
+    issueUrl: issueContent.url,
   };
 }

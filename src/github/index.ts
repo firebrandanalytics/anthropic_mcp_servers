@@ -589,7 +589,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         const args = projects.ConvertProjectDraftToIssueSchema.parse(request.params.arguments);
         const result = await projects.convertProjectDraftToIssue(args);
         return {
-           content: [{ type: "text", text: `Successfully converted draft. New issue created: ${result.issueUrl} (ID: ${result.newItemId}, Number: ${result.issueNumber})` }],
+           content: [{ type: "text", text: `Successfully converted draft item ${args.projectItemId} to issue: ${result.issueUrl} (ID: ${result.newItemId}, Number: ${result.issueNumber})` }],
         };
       }
 
